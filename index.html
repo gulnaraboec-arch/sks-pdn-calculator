@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#a41228">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>Калькулятор ПДН СКС</title>
+<style>
+:root{font:16px/1.5 system-ui,sans-serif;color:#241c20;background:#f7f3f4;--red:#a41228;--line:#e5d9dc;--muted:#61535a}
+*{box-sizing:border-box}body{margin:0;border-top:5px solid var(--red)}[hidden]{display:none!important}
+header,main,footer{max-width:1120px;margin:auto;padding:0 24px}header{padding-top:26px;padding-bottom:20px}
+header img{width:206px;height:35px;display:block}h1{font-size:clamp(2rem,6vw,3.5rem);line-height:1.06;margin:.45em 0 .18em;letter-spacing:-.045em}h2{font-size:1.26rem;margin:0 0 12px}p{margin:0 0 12px}
+.intro,small,.hint,footer{color:var(--muted)}main{display:grid;grid-template-columns:1.12fr 1fr;gap:18px;align-items:start}.stack{display:grid;gap:18px}
+section,details.sources{background:white;border:1px solid var(--line);border-radius:18px;padding:20px;min-width:0}details.sources{grid-column:1/-1}
+.eyebrow{color:var(--red);font-weight:800;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}.wide{grid-column:1/-1}
+label{display:grid;gap:5px;font-weight:650;min-width:0}small,.hint{font-size:.85rem;font-weight:400;display:block}
+input,select,button{font:inherit;min-height:46px;border-radius:9px}input,select{width:100%;padding:8px 10px;border:1px solid #a99ba0;background:#fff;color:inherit}input[type=checkbox]{width:20px;height:20px;min-height:0;accent-color:var(--red)}
+.check{display:flex;align-items:flex-start;gap:8px;font-weight:500}.check input{flex:none;margin-top:3px}button{border:1px solid var(--red);padding:8px 14px;background:white;color:var(--red);font-weight:750;cursor:pointer}.primary{background:var(--red);color:white}button:hover{box-shadow:0 0 0 2px #f1d3d8}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #b42641;outline-offset:2px}
+.result{background:#fff2f4;border-color:#e9bcc4}.number{display:block;font-weight:850;font-size:clamp(2.1rem,7vw,3.4rem);color:var(--red);line-height:1.12;letter-spacing:-.035em;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.expense{background:#fff2f4;border-radius:9px;padding:10px 12px}.expense output{display:block;color:var(--red);font-size:1.35rem;font-weight:800}
+.schedule{grid-column:1/-1}.table-scroll{overflow:auto;max-height:470px;border:1px solid var(--line);border-radius:9px;margin-top:12px}table{width:100%;border-collapse:collapse;white-space:nowrap;font-size:.88rem;font-variant-numeric:tabular-nums}th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line)}th{position:sticky;top:0;background:#f7f3f4}th:first-child,td:first-child{text-align:left}.payment-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}.payment-summary strong{display:block;color:var(--red);font-size:1.3rem}
+.outcome{padding:12px 0;border-top:1px solid var(--line)}.outcome:first-of-type{margin-top:12px}.outcome strong{display:block;font-size:1.32rem}.outcome button{margin-top:8px}.note{padding:10px 12px;border-radius:9px;background:#f7f3f4;margin-top:10px}
+summary{font-weight:750;cursor:pointer}details p:first-of-type{margin-top:10px}footer{padding-top:16px;padding-bottom:24px;font-size:.85rem}
+@media(max-width:730px){header,main,footer{padding-left:14px;padding-right:14px}main{grid-template-columns:1fr}section,details.sources{padding:16px}.stack{gap:14px}}
+@media(max-width:360px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<img alt="СКС Ломбард" width="206" height="35" src="data:image/png;base64,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">
+<h1>Калькулятор ПДН</h1>
+<p class="eyebrow">Версия 1.7 · Первый платёж и график по месяцам</p>
+<p class="intro">Потребительские займы под залог движимого имущества</p>
+</header>
+<main>
+<div class="stack">
+<section aria-labelledby="loanTitle">
+<p class="eyebrow">01 / Условия займа</p><h2 id="loanTitle">Организация и тариф</h2>
+<div class="grid">
+<label class="wide">Организация<select id="company"><option value="gf">МКК «Горизонт-Финанс»</option><option value="kf">МКК «КарФинанс»</option></select></label>
+<label class="wide">Тариф<select id="tariff"></select></label>
+<label>Сумма займа, ₽<input id="amount" inputmode="decimal" maxlength="22" autocomplete="off" placeholder="Например, 100 000"></label>
+<label>Срок, мес.<select id="term"></select></label>
+<label class="wide" id="rateField" hidden>Согласованная ставка, % годовых<select id="rate"></select></label>
+<label class="wide check" id="conditionField" hidden><input type="checkbox" id="condition"><span id="conditionText"></span></label>
+</div>
+<div class="note" id="tariffInfo"></div>
+</section>
+<section aria-labelledby="dataTitle">
+<p class="eyebrow">02 / Данные для ПДН</p><h2 id="dataTitle">Доход и расходы в месяц</h2>
+<div class="grid">
+<label>Доход, ₽<input id="income" inputmode="decimal" maxlength="22" autocomplete="off"><small>Среднемесячный доход по п. 3.6 методики.</small></label>
+<label>Расход по НБКИ, ₽<input id="existing" inputmode="decimal" maxlength="22" autocomplete="off"><small>Итоговый платёж по действующим долгам с корректировками по п. 3.5. При отсутствии введите 0.</small></label>
+<div class="wide expense"><strong id="expenseLabel">Среднемесячный расход нового займа</strong><output id="newExpense" aria-labelledby="expenseLabel">—</output><small>Сумма всех платежей графика ÷ срок. Используется для ПДН.</small></div>
+<button id="reset" class="wide" type="button">Очистить расчёт</button>
+</div>
+</section>
+</div>
+<div class="stack">
+<section class="result" aria-labelledby="resultTitle">
+<p class="eyebrow">03 / Результат</p><h2 id="resultTitle">Итоговый ПДН</h2>
+<div aria-live="polite" aria-atomic="true"><output class="number" id="result">—</output><div id="resultInfo" class="hint"></div></div>
+</section>
+<section aria-labelledby="maxTitle">
+<p class="eyebrow">04 / Подбор займа</p><h2 id="maxTitle">Подбор суммы и срока</h2>
+<p class="hint">Введите желаемую сумму в условиях займа, доход и расход по НБКИ. Калькулятор проверит все сроки выбранного тарифа при ПДН не более 50%. Если сумма не проходит, предложит меньшую. Без желаемой суммы подберёт доступную для каждого срока.</p>
+<div id="refinanceFields" class="note" hidden>
+<label>Минимум для согласованного погашения, ₽<input id="minimum" inputmode="decimal" maxlength="22" autocomplete="off" placeholder="0, если погашения нет"></label>
+<label class="check"><input type="checkbox" id="fixed"><span>Введённый расход по действующим долгам уже скорректирован по п. 3.5.7 и останется тем же при подборе выше этого минимума.</span></label>
+</div>
+<div id="limits"></div>
+</section>
+</div>
+<section class="schedule" aria-labelledby="scheduleTitle">
+<p class="eyebrow">05 / Платежи</p><h2 id="scheduleTitle">Первый платёж и график</h2>
+<p id="scheduleEmpty" class="hint">Укажите сумму, срок и подтвердите условия выбранного тарифа.</p>
+<div id="scheduleContent" hidden>
+<div class="payment-summary">
+<div class="note"><small>Первый месяц</small><strong id="firstPayment"></strong><small id="firstBreakdown"></small></div>
+<div class="note"><small id="regularLabel"></small><strong id="regularPayment"></strong><small id="regularRate"></small></div>
+<div class="note"><small>Последний платёж</small><strong id="lastPayment"></strong><small>С учётом остатка долга и округлений.</small></div>
+</div>
+<p id="scheduleTotals" class="note"></p>
+<p class="hint">Расчётный график по месяцам: годовая ставка ÷ 12. При льготном первом месяце аннуитет сначала рассчитан по льготной ставке на весь срок, со второго месяца пересчитан на остаток долга и оставшийся срок — по предоставленному примеру. Проценты округляются до копеек с округлением точной половины к чётному. Фактические даты и дополнительные услуги договора требуют отдельной сверки.</p>
+<details><summary>Показать все платежи</summary>
+<div class="table-scroll" tabindex="0" role="region" aria-label="График платежей по месяцам">
+<table><thead><tr><th scope="col">Месяц</th><th scope="col">Годовых</th><th scope="col">Платёж, ₽</th><th scope="col">Проценты, ₽</th><th scope="col">Основной долг, ₽</th><th scope="col">Остаток, ₽</th></tr></thead><tbody id="scheduleRows"></tbody></table>
+</div></details>
+</div>
+</section>
+<details class="sources">
+<summary>Основания и расчёт</summary>
+<p id="sources"></p>
+<p>ПДН = (платежи по действующим обязательствам + платёж по новому займу) ÷ среднемесячный доход × 100%. Показатель отображается с одним знаком после запятой. При подборе суммы ПДН не должен превышать 50% до округления. Раздел 6 методик оценивает ПДН вместе с другими факторами риска.</p>
+<p>В тарифах с льготным первым месяцем применяется пересчёт аннуитета на остаток долга со второго месяца по предоставленному примеру графика. Для ПДН используется сумма всех платежей, делённая на срок по п. 3.5.5. Среднее отображается до копеек, ПДН и граница 50% проверяются без округления этого среднего.</p>
+<p>При рефинансировании и других особых случаях введите итоговый расход, уже рассчитанный по методике. Используйте калькулятор для случаев, в которых методика требует расчёт ПДН.</p>
+</details>
+</main>
+<footer>Суммы обрабатываются в браузере и очищаются при обновлении страницы.</footer>
+<script>
+const companies = {
+  gf: {name: 'Горизонт-Финанс', method: 'ГФ-29 от 30.06.2026', order: 'ГФ-42 от 23.09.2026'},
+  kf: {name: 'КарФинанс', method: 'КФ-41 от 13.07.2026', order: 'КФ-54 от 23.09.2026'}
+};
+const bands = [[3000000,9999999],[10000000,29999999],[30000000,50000000]];
+const longTerms = [60,84,120];
+const approvedRates = [115,110,100,95,85,75,65];
+const stepped = (rates, first = null, start = 0) => bands.slice(start).map(([min,max], i) => ({
+  min, max, first, rate: rates[i + start]
+}));
+const tariffs = {
+  standard: {name:'Аннуитет стандартный', terms:longTerms, rows:stepped([115,110,105])},
+  new: {name:'Новый клиент', terms:longTerms, rows:stepped([115,112,107],36.5), condition:'Клиент впервые заключает договор займа с этой МКК.'},
+  refinance: {name:'Рефинансирование', terms:[60], rows:[{min:3000000,max:50000000,first:36.5}], rates:approvedRates, condition:'Средства направляются на погашение займа под залог движимого имущества в другой финансовой организации.'},
+  individual: {name:'Индивидуальный', terms:[60], rows:[{min:3000000,max:50000000,first:36.5}], rates:approvedRates, condition:'Применение согласовано руководителем направления.'},
+  business: {name:'Деловой', terms:longTerms, rows:stepped([115,112,107],36.5,1), condition:'Заёмщик — физлицо со статусом действующего ИП.'},
+  premium: {name:'Премиум', company:'kf', terms:[36,60], rows:[{min:5000000,max:50000000,first:null}], rates:[36,48], condition:'Тариф и ставка согласованы по результатам оценки заёмщика.'}
+};
+const effective = '2026-10-01';
+
+function cents(value) {
+  const input = String(value).trim().replace(/[ \u00a0\u202f]/g,'').replace(',','.');
+  if (!/^\d{1,10}(\.\d{1,2})?$/.test(input)) return null;
+  const [rubles, fraction = ''] = input.split('.');
+  return Number(rubles)*100 + Number(fraction.padEnd(2,'0'));
+}
+
+function pdn(income, existing, total, months = 1) {
+  if (!Number.isSafeInteger(income) || income <= 0 ||
+      ![existing,total].every(n => Number.isSafeInteger(n) && n >= 0) ||
+      !Number.isSafeInteger(months) || months < 1) return null;
+  const period = BigInt(months);
+  const denominator = BigInt(income)*period;
+  const numerator = BigInt(existing)*period + BigInt(total);
+  const tenths = (numerator*2000n + denominator)/(2n*denominator);
+  return {
+    tenths, above50:numerator*100n > denominator*50n,
+    above80:numerator*100n > denominator*80n,
+    near50:tenths === 500n && numerator*100n > denominator*50n,
+    near80:tenths === 800n && numerator*100n > denominator*80n
+  };
+}
+
+function budget(income, existing, limit) {
+  return Number(BigInt(income)*BigInt(limit)/100n)-existing;
+}
+
+function offer(tariff, amount, term, selected) {
+  if (amount === null || !tariff.terms.includes(term)) return null;
+  const row = tariff.rows.find(r => amount >= r.min && amount <= r.max);
+  if (!row) return null;
+  const rate = row.rate ?? selected;
+  if (tariff.rates && !tariff.rates.includes(rate)) return null;
+  return {row,rate,...paymentSchedule(amount,term,row.first,rate)};
+}
+
+function annuity(amount, months, annualRate) {
+  const monthly = annualRate/1200;
+  const raw = monthly === 0 ? amount/months : amount*monthly/(1-(1+monthly)**-months);
+  const floor = Math.floor(raw), fraction = raw-floor;
+  return Math.abs(fraction-0.5) < 1e-8 ? floor + floor%2 : Math.round(raw);
+}
+
+// Contract example uses rounding to the nearest even cent at exact half-cent ties.
+function interestForMonth(balance, rate) {
+  const numerator = BigInt(balance)*BigInt(Math.round(rate*100));
+  const divisor = 120000n, quotient = numerator/divisor, remainder = numerator%divisor;
+  return Number(quotient + (remainder*2n > divisor ||
+    remainder*2n === divisor && quotient%2n === 1n ? 1n : 0n));
+}
+
+function paymentSchedule(amount, term, first, rate) {
+  const firstRate = first ?? rate;
+  const firstPayment = annuity(amount,term,firstRate);
+  const firstInterest = interestForMonth(amount,firstRate);
+  const remaining = Math.max(0,amount-(firstPayment-firstInterest));
+  const regularPayment = first === null ? firstPayment : annuity(remaining,term-1,rate);
+  let balance = amount, total = 0, totalInterest = 0;
+  const rows = [];
+  for (let month=1; month<=term; month++) {
+    const annualRate = month === 1 ? firstRate : rate;
+    const interest = interestForMonth(balance,annualRate);
+    const planned = month === 1 ? firstPayment : regularPayment;
+    const payment = month === term ? balance+interest : Math.min(planned,balance+interest);
+    const principal = payment-interest;
+    balance -= principal;
+    total += payment;
+    totalInterest += interest;
+    rows.push({month,rate:annualRate,payment,interest,principal,balance});
+  }
+  return {rows,firstPayment:rows[0].payment,regularPayment,total,totalInterest,
+    lastPayment:rows.at(-1).payment,payment:Math.round(total/term)};
+}
+
+function maximum(tariff, term, selected, allowance, minimum = 0, ceiling = Infinity) {
+  if (allowance < 0 || !tariff.terms.includes(term) ||
+      (tariff.rates && !tariff.rates.includes(selected))) return null;
+  let best = null;
+  // Try the requested ceiling explicitly before searching lower amounts.
+  for (const row of tariff.rows) {
+    const rate = row.rate ?? selected;
+    let low = Math.max(row.min,minimum), high = Math.min(row.max,ceiling);
+    if (low > high) continue;
+    const upperSchedule = paymentSchedule(high,term,row.first,rate);
+    if (upperSchedule.total <= allowance*term) {
+      if (!best || high > best.amount) best = {amount:high,...upperSchedule,row,rate};
+      continue;
+    }
+    while (low <= high) {
+      const amount = Math.floor((low+high)/2);
+      const schedule = paymentSchedule(amount,term,row.first,rate);
+      if (schedule.total <= allowance*term) {
+        if (!best || amount > best.amount) best = {amount,...schedule,row,rate};
+        low = amount+1;
+      } else {
+        high = amount-1;
+      }
+    }
+  }
+  return best;
+}
+
+if (typeof module !== 'undefined') module.exports = {companies,tariffs,effective,cents,pdn,budget,offer,annuity,interestForMonth,paymentSchedule,maximum};
+
+// Интерфейс калькулятора
+const byId = id => document.getElementById(id);
+const value = id => byId(id).value;
+const read = id => cents(value(id));
+const rubles = new Intl.NumberFormat('ru-RU',{style:'currency',currency:'RUB'});
+const money = n => rubles.format(n/100);
+const annual = n => n.toLocaleString('ru-RU',{minimumFractionDigits:2}) + '%';
+const pct = n => n/10n + ',' + n%10n + '%';
+const setText = (id, text) => { byId(id).textContent = text; };
+
+function options(id, pairs, preferred) {
+  const select = byId(id);
+  select.replaceChildren(...pairs.map(([key,name]) => new Option(name,key)));
+  if (pairs.some(([key]) => String(key) === preferred)) select.value = preferred;
+}
+
+function configureCompany() {
+  options('tariff',Object.entries(tariffs)
+    .filter(([,t]) => !t.company || t.company === value('company'))
+    .map(([key,t]) => [key,t.name]),value('tariff'));
+  configureTariff();
+}
+
+function configureTariff() {
+  const tariff = tariffs[value('tariff')];
+  options('term',tariff.terms.map(n => [n,n]),value('term'));
+  options('rate',[['','Выберите ставку'],...(tariff.rates || []).map(n => [n,annual(n)])]);
+  byId('rateField').hidden = !tariff.rates;
+  byId('conditionField').hidden = !tariff.condition;
+  setText('conditionText',tariff.condition ? 'Подтверждаю: ' + tariff.condition : '');
+  byId('condition').checked = byId('fixed').checked = false;
+  byId('minimum').value = '';
+  render();
+}
+
+function renderSchedule(current, term) {
+  byId('scheduleContent').hidden = !current;
+  byId('scheduleEmpty').hidden = !!current;
+  byId('scheduleRows').replaceChildren();
+  if (!current) return;
+  setText('firstPayment',money(current.firstPayment));
+  setText('firstBreakdown',annual(current.rows[0].rate) + ' годовых · проценты ' +
+    money(current.rows[0].interest) + ' · основной долг ' + money(current.rows[0].principal));
+  setText('regularLabel','Со 2-го по ' + (term-1) + '-й месяц');
+  setText('regularPayment',money(current.regularPayment));
+  setText('regularRate',annual(current.rate) + ' годовых');
+  setText('lastPayment',money(current.lastPayment));
+  setText('scheduleTotals','Всего платежей: ' + money(current.total) +
+    ' · из них проценты: ' + money(current.totalInterest) +
+    ' · среднее в месяц: ' + money(current.total/term));
+  for (const row of current.rows) {
+    const tr = document.createElement('tr');
+    for (const text of [row.month,annual(row.rate),money(row.payment),money(row.interest),
+      money(row.principal),money(row.balance)]) {
+      const td = document.createElement('td');
+      td.textContent = text;
+      tr.append(td);
+    }
+    byId('scheduleRows').append(tr);
+  }
+}
+
+function render() {
+  const company = companies[value('company')], key = value('tariff'), tariff = tariffs[key];
+  const term = Number(value('term')), selected = Number(value('rate')), amount = read('amount');
+  const income = read('income'), existing = read('existing');
+  const local = new Date();
+  const date = [local.getFullYear(),local.getMonth()+1,local.getDate()].map(n => String(n).padStart(2,'0')).join('-');
+  const termsReady = date >= effective && (!tariff.condition || byId('condition').checked) &&
+    (!tariff.rates || tariff.rates.includes(selected));
+  const current = offer(tariff,amount,term,selected);
+  const condition = date < effective ? 'Тарифы действуют с 01.10.2026.' :
+    tariff.condition && !byId('condition').checked ? 'Подтвердите условие тарифа.' :
+    tariff.rates && !tariff.rates.includes(selected) ? 'Выберите согласованную ставку из приказа.' : '';
+  const range = 'Диапазон: ' + money(tariff.rows[0].min) + ' – ' + money(tariff.rows.at(-1).max) + '.';
+  const rateText = current && date >= effective ?
+    (current.row.first === null ? annual(current.rate) + ' годовых' :
+      '1-й месяц ' + annual(current.row.first) + ', далее ' + annual(current.rate) + ' годовых') +
+    (termsReady ? ' · средний расход ' + money(current.total/term) + ' в месяц.' : '.') : '';
+  setText('tariffInfo',[rateText,condition,!rateText ? range : '',
+    value('amount') && amount === null ? 'Проверьте формат суммы.' :
+    amount !== null && !tariff.rows.some(r => amount >= r.min && amount <= r.max) ? 'Сумма вне тарифа.' : ''
+  ].filter(Boolean).join(' '));
+  setText('sources',company.method + ', разделы 3 и 6. ' + company.order + ', тарифы с 01.10.2026 на IV квартал 2026 года.');
+  const refinance = key === 'refinance' || key === 'premium';
+  byId('refinanceFields').hidden = !refinance;
+  const schedule = termsReady ? current : null;
+  renderSchedule(schedule,term);
+  setText('newExpense',schedule ? money(schedule.total/term) : '—');
+  const result = pdn(income,existing,schedule?.total ?? null,term);
+  setText('result',result ? pct(result.tenths) : '—');
+  const resultLabel = 'Предварительный ПДН по оценке платежа.';
+  const threshold = result?.above50 ? ' ПДН превышает 50%. Уменьшите сумму займа.' +
+      (result.near50 ? ' Отображаемые 50,0% получены округлением.' : '') :
+    ' ПДН не более 50%.';
+  const dataIssue = income === null || income === 0 ? 'Укажите доход больше нуля.' :
+    existing === null ? 'Укажите действующий расход. При отсутствии введите 0.' : '';
+  const paymentIssue = condition || 'Укажите сумму в диапазоне тарифа.';
+  setText('resultInfo',result ? resultLabel + threshold : dataIssue || paymentIssue);
+  const minimum = refinance ? read('minimum') : 0;
+  const amountIssue = value('amount').trim() && (amount === null || !tariff.rows.some(r => amount >= r.min && amount <= r.max))
+    ? 'Укажите желаемую сумму в диапазоне тарифа или очистите поле для подбора максимальной суммы.' : '';
+  const block = dataIssue || condition || amountIssue || (refinance && (minimum === null || !byId('fixed').checked)
+    ? 'Укажите минимум и подтвердите, что расход по действующим долгам фиксирован для подбора.' : '');
+  const limits = byId('limits');
+  limits.replaceChildren();
+  if (block) {
+    const hint = document.createElement('p');
+    hint.className = 'note hint';
+    hint.textContent = block;
+    limits.append(hint);
+    return;
+  }
+  const allowance = budget(income,existing,50);
+  const variants = tariff.terms.map(months => ({
+    months, best:maximum(tariff,months,selected,allowance,minimum,amount ?? Infinity)
+  }));
+  const suitable = variants.filter(v => v.best);
+  const preferred = suitable.slice().sort((a,b) => b.best.amount-a.best.amount || a.months-b.months)[0];
+  const summary = document.createElement('p');
+  summary.className = 'note hint';
+  summary.textContent = preferred ? amount === null ?
+    'Рекомендован вариант с наибольшей найденной суммой. При равной сумме выбран самый короткий срок.' :
+    preferred.best.amount === amount ? 'Желаемая сумма проходит. Рекомендован самый короткий подходящий срок.' :
+    'Желаемая сумма не проходит ни на одном доступном сроке. Предложены меньшие суммы при ПДН не более 50%.' :
+    'Ни на одном доступном сроке сумма в пределах тарифа не проходит по ПДН 50%.';
+  limits.append(summary);
+  for (const variant of variants) {
+    const {months,best} = variant;
+    const row = document.createElement('div');
+    row.className = 'outcome';
+    const title = document.createElement('small');
+    title.textContent = months + ' мес.' + (variant === preferred ? ' · Рекомендуем' : '') + ' · ПДН не более 50%';
+    const headline = document.createElement('strong');
+    headline.textContent = best ? money(best.amount) : 'Подходящей суммы нет';
+    const detail = document.createElement('small');
+    detail.textContent = best ? 'Средний расход ≈ ' + money(best.total/months) + ' · ПДН ' +
+      pct(pdn(income,existing,best.total,months).tenths) + ' · ставка ' +
+      (best.row.first === null ? '' : annual(best.row.first) + ' → ') + annual(best.rate) :
+      allowance <= 0 ? 'Действующие платежи исчерпывают лимит.' :
+        'Лимит нового платежа ' + money(allowance) + ' в месяц. В заданных условиях подходящей суммы нет.';
+    row.append(title,headline,detail);
+    if (best) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = 'Выбрать сумму и срок';
+      button.onclick = () => {
+        byId('amount').value = (best.amount/100).toFixed(2).replace('.',',');
+        byId('term').value = String(months);
+        render();
+        byId('amount').focus();
+      };
+      row.append(button);
+    }
+    limits.append(row);
+  }
+}
+
+byId('company').onchange = configureCompany;
+byId('tariff').onchange = configureTariff;
+for (const id of ['amount','income','existing','minimum']) byId(id).oninput = render;
+for (const id of ['term','rate','fixed','condition']) byId(id).onchange = render;
+byId('reset').onclick = () => {
+  for (const id of ['amount','income','existing','minimum']) byId(id).value = '';
+  configureTariff();
+  byId('amount').focus();
+};
+window.addEventListener('pageshow',event => {
+  if (event.persisted) byId('reset').click();
+});
+configureCompany();
+
+</script>
+</body>
+</html>
